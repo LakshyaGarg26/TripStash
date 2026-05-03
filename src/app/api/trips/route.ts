@@ -20,7 +20,10 @@ export async function POST(request: Request) {
   const parsed = createTripSchema.safeParse(body);
 
   if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid trip." }, { status: 400 });
+    return NextResponse.json(
+      { error: parsed.error.issues[0]?.message ?? "Invalid trip." },
+      { status: 400 },
+    );
   }
 
   const user = await getOrCreateDemoUser();

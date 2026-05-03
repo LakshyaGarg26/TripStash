@@ -38,11 +38,7 @@ ${JSON.stringify(input, null, 2)}
 
 function mockClassification(input: ClassificationInput) {
   const text = `${input.title ?? ""} ${input.description ?? ""} ${input.note ?? ""} ${input.url ?? ""}`.toLowerCase();
-  const destination = text.includes("bali")
-    ? "Bali"
-    : text.includes("thailand")
-      ? "Thailand"
-      : null;
+  const destination = inferDestination(text);
   const category = text.includes("cafe") || text.includes("food") || text.includes("vegetarian")
     ? "food"
     : text.includes("sunrise") || text.includes("viewpoint")
@@ -67,4 +63,20 @@ function mockClassification(input: ClassificationInput) {
       ? null
       : "Which destination should I connect this memory to?",
   });
+}
+
+function inferDestination(text: string) {
+  const match = text.match(/\b(?:in|near|around|for)\s+([a-z][a-z\s-]{2,40})/i);
+  if (!match?.[1]) return null;
+
+  const cleaned = match[1]
+    .split(/\b(?:for|with|and|or|from|to|on|at)\b/i)[0]
+    .trim();
+
+  if (!cleaned) return null;
+
+  return cleaned
+    .split(/\s+/)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
 }

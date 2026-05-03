@@ -1,4 +1,5 @@
 import { Bot, Sparkles } from "lucide-react";
+import Link from "next/link";
 
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Badge } from "@/components/ui/badge";
@@ -10,7 +11,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-30 border-b bg-background/90 backdrop-blur">
         <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4">
-          <div className="flex items-center gap-3">
+          <Link className="flex items-center gap-3" href="/saved">
             <div className="flex size-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">
               <Sparkles className="size-5" />
             </div>
@@ -20,7 +21,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 Save now. Plan later.
               </p>
             </div>
-          </div>
+          </Link>
           <div className="flex items-center gap-2">
             <Badge className="hidden sm:inline-flex" variant="secondary">
               <Bot className="mr-1 size-3" />

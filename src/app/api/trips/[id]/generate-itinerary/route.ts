@@ -91,6 +91,16 @@ export async function POST(_request: Request, { params }: Params) {
                 rank,
               })),
             },
+            influences: {
+              create: item.savedItemInfluences
+                .filter((influence) =>
+                  savedItems.some((savedItem) => savedItem.id === influence.savedItemId),
+                )
+                .map((influence) => ({
+                  savedItemId: influence.savedItemId,
+                  influenceReason: influence.reason,
+                })),
+            },
           })),
         },
       },

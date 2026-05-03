@@ -26,7 +26,7 @@ export const createTripSchema = z.object({
   endDate: z.string().date(),
   pace: z.enum(["relaxed", "balanced", "packed"]).default("balanced"),
   budgetLevel: z.enum(["low", "medium", "high"]).default("medium"),
-  notes: z.string().max(2000).optional(),
+  notes: z.string().max(2000).optional().nullable(),
 });
 
 export const savedItemClassificationSchema = z.object({

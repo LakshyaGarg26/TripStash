@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: tripstash-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: tripstash
+      POSTGRES_PASSWORD: tripstash
+      POSTGRES_DB: tripstash
+    ports:
+      - "55432:5432"
+    volumes:
+      - tripstash-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tripstash -d tripstash"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  tripstash-postgres-data:
