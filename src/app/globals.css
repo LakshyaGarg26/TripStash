@@ -3,48 +3,48 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: #faf6f1;
-  --foreground: #1a1918;
+  --background: #ffffff;
+  --foreground: #09090b;
   --card: #ffffff;
-  --card-foreground: #1a1918;
+  --card-foreground: #09090b;
   --popover: #ffffff;
-  --popover-foreground: #1a1918;
-  --primary: #d97757;
-  --primary-foreground: #faf6f1;
-  --secondary: #f5f0e8;
-  --secondary-foreground: #1a1918;
-  --muted: #f5f0e8;
-  --muted-foreground: #5c5954;
-  --accent: #fdf7f5;
-  --accent-foreground: #1a1918;
-  --destructive: #c44e47;
-  --destructive-foreground: #faf6f1;
-  --border: #eae4d9;
-  --input: #eae4d9;
-  --ring: #d97757;
+  --popover-foreground: #09090b;
+  --primary: #18181b;
+  --primary-foreground: #fafafa;
+  --secondary: #f4f4f5;
+  --secondary-foreground: #18181b;
+  --muted: #f4f4f5;
+  --muted-foreground: #71717a;
+  --accent: #f1f5f9;
+  --accent-foreground: #0f172a;
+  --destructive: #dc2626;
+  --destructive-foreground: #fafafa;
+  --border: #e4e4e7;
+  --input: #e4e4e7;
+  --ring: #71717a;
   --radius: 0.75rem;
 }
 
 .dark {
-  --background: #2b2824;
-  --foreground: #f0ede8;
-  --card: #33302b;
-  --card-foreground: #f0ede8;
-  --popover: #33302b;
-  --popover-foreground: #f0ede8;
-  --primary: #e08a6d;
-  --primary-foreground: #1a1918;
-  --secondary: #3d3a34;
-  --secondary-foreground: #f0ede8;
-  --muted: #3d3a34;
-  --muted-foreground: #b5b0a8;
-  --accent: #3a2e28;
-  --accent-foreground: #f0ede8;
-  --destructive: #e06b63;
-  --destructive-foreground: #1a1918;
-  --border: #504c45;
-  --input: #504c45;
-  --ring: #e08a6d;
+  --background: #09090b;
+  --foreground: #fafafa;
+  --card: #18181b;
+  --card-foreground: #fafafa;
+  --popover: #18181b;
+  --popover-foreground: #fafafa;
+  --primary: #fafafa;
+  --primary-foreground: #18181b;
+  --secondary: #27272a;
+  --secondary-foreground: #fafafa;
+  --muted: #27272a;
+  --muted-foreground: #a1a1aa;
+  --accent: #1e293b;
+  --accent-foreground: #f8fafc;
+  --destructive: #ef4444;
+  --destructive-foreground: #fafafa;
+  --border: #27272a;
+  --input: #27272a;
+  --ring: #a1a1aa;
 }
 
 @theme inline {
