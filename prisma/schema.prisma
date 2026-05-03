@@ -1,0 +1,192 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum SavedItemInputType {
+  url
+  note
+  url_with_note
+}
+
+enum SavedItemStatus {
+  active
+  archived
+  failed_extraction
+}
+
+enum TripPace {
+  relaxed
+  balanced
+  packed
+}
+
+enum BudgetLevel {
+  low
+  medium
+  high
+}
+
+enum TripStatus {
+  draft
+  generated
+  archived
+}
+
+enum LoginCodeStatus {
+  pending
+  consumed
+  expired
+}
+
+model User {
+  id                String      @id @default(cuid())
+  name              String?
+  telegramId        String      @unique
+  telegramUsername  String?
+  telegramFirstName String?
+  telegramLastName  String?
+  telegramPhotoUrl  String?
+  savedItems        SavedItem[]
+  trips             Trip[]
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+}
+
+model LoginCode {
+  id         String          @id @default(cuid())
+  codeHash   String          @unique
+  telegramId String?
+  status     LoginCodeStatus @default(pending)
+  expiresAt  DateTime
+  createdAt  DateTime        @default(now())
+  consumedAt DateTime?
+}
+
+model SavedItem {
+  id                  String               @id @default(cuid())
+  userId              String
+  user                User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  inputType           SavedItemInputType
+  originalUrl         String?
+  sourcePlatform      String?
+  title               String
+  summary             String?
+  thumbnailUrl        String?
+  rawMetadata         Json?
+  userNote            String?
+  detectedPlaceName   String?
+  detectedDestination String?
+  latitude            Float?
+  longitude           Float?
+  category            String              @default("other")
+  tags                String[]            @default([])
+  confidence          Float               @default(0)
+  importance          Int                 @default(0)
+  isMustVisit         Boolean             @default(false)
+  status              SavedItemStatus     @default(active)
+  influences          SavedItemInfluence[]
+  recommendationLinks RecommendationOption[]
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+
+  @@index([userId, detectedDestination])
+  @@index([userId, category])
+}
+
+model Trip {
+  id          String       @id @default(cuid())
+  userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  destination String
+  startDate   DateTime
+  endDate     DateTime
+  pace        TripPace     @default(balanced)
+  budgetLevel BudgetLevel  @default(medium)
+  notes       String?
+  status      TripStatus   @default(draft)
+  itinerary   Itinerary?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Itinerary {
+  id                 String         @id @default(cuid())
+  tripId             String         @unique
+  trip               Trip           @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  summary            String
+  estimatedCostRange String?
+  aiModel            String?
+  generationInput    Json?
+  generationOutput   Json?
+  days               ItineraryDay[]
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+}
+
+model ItineraryDay {
+  id          String          @id @default(cuid())
+  itineraryId String
+  itinerary   Itinerary       @relation(fields: [itineraryId], references: [id], onDelete: Cascade)
+  dayNumber   Int
+  date        DateTime
+  area        String?
+  summary     String?
+  items       ItineraryItem[]
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}
+
+model ItineraryItem {
+  id                 String                 @id @default(cuid())
+  itineraryDayId     String
+  itineraryDay       ItineraryDay           @relation(fields: [itineraryDayId], references: [id], onDelete: Cascade)
+  timeBlock          String
+  title              String
+  selectedOptionName String
+  category           String                 @default("other")
+  description        String?
+  bestTime           String?
+  estimatedCost      String?
+  travelTimeNote     String?
+  reasoning          String?
+  mapSearchUrl       String?
+  sortOrder          Int                    @default(0)
+  options            RecommendationOption[]
+  influences         SavedItemInfluence[]
+  createdAt          DateTime               @default(now())
+  updatedAt          DateTime               @updatedAt
+}
+
+model RecommendationOption {
+  id              String        @id @default(cuid())
+  itineraryItemId String
+  itineraryItem   ItineraryItem @relation(fields: [itineraryItemId], references: [id], onDelete: Cascade)
+  name            String
+  area            String?
+  rating          Float?
+  priceRange      String?
+  pros            String[]      @default([])
+  cons            String[]      @default([])
+  bestFor         String?
+  sourceUrls      String[]      @default([])
+  savedItemId     String?
+  savedItem       SavedItem?    @relation(fields: [savedItemId], references: [id], onDelete: SetNull)
+  rank            Int           @default(0)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model SavedItemInfluence {
+  id              String        @id @default(cuid())
+  savedItemId     String
+  savedItem       SavedItem     @relation(fields: [savedItemId], references: [id], onDelete: Cascade)
+  itineraryItemId String
+  itineraryItem   ItineraryItem @relation(fields: [itineraryItemId], references: [id], onDelete: Cascade)
+  influenceReason String
+  createdAt       DateTime      @default(now())
+}

@@ -1,0 +1,99 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: #faf6f1;
+  --foreground: #1a1918;
+  --card: #ffffff;
+  --card-foreground: #1a1918;
+  --popover: #ffffff;
+  --popover-foreground: #1a1918;
+  --primary: #d97757;
+  --primary-foreground: #faf6f1;
+  --secondary: #f5f0e8;
+  --secondary-foreground: #1a1918;
+  --muted: #f5f0e8;
+  --muted-foreground: #5c5954;
+  --accent: #fdf7f5;
+  --accent-foreground: #1a1918;
+  --destructive: #c44e47;
+  --destructive-foreground: #faf6f1;
+  --border: #eae4d9;
+  --input: #eae4d9;
+  --ring: #d97757;
+  --radius: 0.75rem;
+}
+
+.dark {
+  --background: #2b2824;
+  --foreground: #f0ede8;
+  --card: #33302b;
+  --card-foreground: #f0ede8;
+  --popover: #33302b;
+  --popover-foreground: #f0ede8;
+  --primary: #e08a6d;
+  --primary-foreground: #1a1918;
+  --secondary: #3d3a34;
+  --secondary-foreground: #f0ede8;
+  --muted: #3d3a34;
+  --muted-foreground: #b5b0a8;
+  --accent: #3a2e28;
+  --accent-foreground: #f0ede8;
+  --destructive: #e06b63;
+  --destructive-foreground: #1a1918;
+  --border: #504c45;
+  --input: #504c45;
+  --ring: #e08a6d;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+* {
+  border-color: var(--border);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+button,
+a,
+input,
+textarea,
+select {
+  touch-action: manipulation;
+}
