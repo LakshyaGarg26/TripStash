@@ -22,6 +22,8 @@ export const updateSavedItemSchema = z.object({
 
 export const createTripSchema = z.object({
   destination: z.string().min(1).max(120),
+  destinationPlaceId: z.string().min(1).max(240).optional(),
+  destinationLabel: z.string().max(500).optional().nullable(),
   startDate: z.string().date(),
   endDate: z.string().date(),
   pace: z.enum(["relaxed", "balanced", "packed"]).default("balanced"),

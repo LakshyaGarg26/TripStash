@@ -4,6 +4,7 @@ import { CalendarDays, PlaneTakeoff, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
+import { LocationAutocompleteInput } from "@/components/places/location-autocomplete-input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -27,11 +28,26 @@ export function PlanTripCard({ defaults }: { defaults: PlanTripDefaults }) {
     setError(null);
     startTransition(async () => {
       const notes = formData.get("notes");
+      const destination = formData.get("destination");
+      const destinationPlaceId = formData.get("destinationPlaceId");
+
+      if (
+        typeof destination !== "string" ||
+        !destination.trim() ||
+        typeof destinationPlaceId !== "string" ||
+        !destinationPlaceId.trim()
+      ) {
+        setError("Select a destination from the place suggestions.");
+        return;
+      }
+
       const response = await fetch("/api/trips", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
-          destination: formData.get("destination"),
+          destination,
+          destinationPlaceId,
+          destinationLabel: formData.get("destinationLabel"),
           startDate: formData.get("startDate"),
           endDate: formData.get("endDate"),
           pace: formData.get("pace"),
@@ -67,12 +83,7 @@ export function PlanTripCard({ defaults }: { defaults: PlanTripDefaults }) {
           action={handleSubmit}
           className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6"
         >
-          <Input
-            name="destination"
-            defaultValue={defaults.destination}
-            aria-label="Destination"
-            placeholder="Destination"
-          />
+          <LocationAutocompleteInput defaultValue={defaults.destination} />
           <div className="relative">
             <CalendarDays className="absolute left-3 top-3 size-4 text-muted-foreground" />
             <Input
