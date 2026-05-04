@@ -16,7 +16,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const body = await request.json();
+  const body = await request.json().catch(() => null);
   const parsed = createTripSchema.safeParse(body);
 
   if (!parsed.success) {
@@ -26,18 +26,28 @@ export async function POST(request: Request) {
     );
   }
 
-  const user = await getOrCreateDemoUser();
-  const trip = await prisma.trip.create({
-    data: {
-      userId: user.id,
-      destination: parsed.data.destination,
-      startDate: new Date(parsed.data.startDate),
-      endDate: new Date(parsed.data.endDate),
-      pace: parsed.data.pace,
-      budgetLevel: parsed.data.budgetLevel,
-      notes: parsed.data.notes,
-    },
-  });
+  try {
+    const user = await getOrCreateDemoUser();
+    const trip = await prisma.trip.create({
+      data: {
+        userId: user.id,
+        destination: parsed.data.destination,
+        startDate: new Date(parsed.data.startDate),
+        endDate: new Date(parsed.data.endDate),
+        pace: parsed.data.pace,
+        budgetLevel: parsed.data.budgetLevel,
+        notes: parsed.data.notes,
+      },
+    });
 
-  return NextResponse.json({ trip }, { status: 201 });
+    return NextResponse.json({ trip }, { status: 201 });
+  } catch (error) {
+    return NextResponse.json(
+      {
+        error:
+          error instanceof Error ? error.message : "Could not create this trip.",
+      },
+      { status: 500 },
+    );
+  }
 }

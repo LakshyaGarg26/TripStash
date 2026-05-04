@@ -10,9 +10,14 @@ import {
 
 export const dynamic = "force-dynamic";
 
-export default async function Home() {
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; category?: string }>;
+}) {
+  const filters = await searchParams;
   const [memories, trip, workspace] = await Promise.all([
-    getSavedItems(),
+    getSavedItems({ q: filters.q, category: filters.category }),
     getLatestTripWithItinerary(),
     getWorkspaceDefaults(),
   ]);
@@ -20,7 +25,15 @@ export default async function Home() {
   return (
     <AppShell>
       <div className="space-y-8">
-        <MemoryInbox memories={memories} workspaceLabel={workspace.label} />
+        <MemoryInbox
+          activeCategory={filters.category ?? "all"}
+          basePath="/"
+          limit={6}
+          memories={memories}
+          query={filters.q ?? ""}
+          showViewMore
+          workspaceLabel={workspace.label}
+        />
         <PlanTripCard defaults={workspace} />
         <ItineraryPreview trip={trip} />
       </div>

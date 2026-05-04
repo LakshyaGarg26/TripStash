@@ -20,27 +20,38 @@ export async function GET(_request: Request, { params }: Params) {
 
 export async function PATCH(request: Request, { params }: Params) {
   const { id } = await params;
-  const body = await request.json();
+  const body = await request.json().catch(() => null);
   const parsed = updateSavedItemSchema.safeParse(body);
 
   if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid update." }, { status: 400 });
+    return NextResponse.json(
+      { error: parsed.error.issues[0]?.message ?? "Invalid update." },
+      { status: 400 },
+    );
   }
 
-  const item = await prisma.savedItem.update({
-    where: { id },
-    data: parsed.data,
-  });
+  try {
+    const item = await prisma.savedItem.update({
+      where: { id },
+      data: parsed.data,
+    });
 
-  return NextResponse.json({ item });
+    return NextResponse.json({ item });
+  } catch {
+    return NextResponse.json({ error: "Saved item not found." }, { status: 404 });
+  }
 }
 
 export async function DELETE(_request: Request, { params }: Params) {
   const { id } = await params;
-  const item = await prisma.savedItem.update({
-    where: { id },
-    data: { status: "archived" },
-  });
+  try {
+    const item = await prisma.savedItem.update({
+      where: { id },
+      data: { status: "archived" },
+    });
 
-  return NextResponse.json({ item });
+    return NextResponse.json({ item });
+  } catch {
+    return NextResponse.json({ error: "Saved item not found." }, { status: 404 });
+  }
 }

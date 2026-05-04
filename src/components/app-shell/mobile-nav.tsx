@@ -1,16 +1,15 @@
 "use client";
 
-import { CalendarDays, Inbox, Plane, UserRound } from "lucide-react";
+import { CalendarDays, Home, Inbox } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { cn } from "@/lib/utils";
 
 const navItems = [
+  { label: "Home", icon: Home, href: "/" },
   { label: "Saved", icon: Inbox, href: "/saved" },
-  { label: "Plan", icon: Plane, href: "/" },
   { label: "Trips", icon: CalendarDays, href: "/trips" },
-  { label: "Profile", icon: UserRound, href: "/" },
 ];
 
 export function MobileNav() {
@@ -18,7 +17,7 @@ export function MobileNav() {
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 border-t bg-background/95 px-3 pb-3 pt-2 backdrop-blur md:hidden">
-      <div className="mx-auto grid max-w-md grid-cols-4 gap-1">
+      <div className="mx-auto grid max-w-md grid-cols-3 gap-1">
         {navItems.map((item) => (
           <Link
             key={item.label}

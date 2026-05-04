@@ -2,11 +2,12 @@ import { CalendarDays, MapPin } from "lucide-react";
 import Link from "next/link";
 
 import { AppShell } from "@/components/app-shell/app-shell";
+import { Breadcrumbs } from "@/components/navigation/breadcrumbs";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PlanTripCard } from "@/components/trips/plan-trip-card";
 import { getTrips, getWorkspaceDefaults } from "@/lib/travel/queries";
-import { formatDate } from "@/lib/utils";
+import { formatDate, tripHref } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -19,6 +20,13 @@ export default async function TripsPage() {
   return (
     <AppShell>
       <div className="space-y-6">
+        <Breadcrumbs
+          items={[
+            { label: "Home", href: "/" },
+            { label: "Trips" },
+          ]}
+        />
+
         <div>
           <Badge variant="secondary">Trips</Badge>
           <h1 className="mt-3 text-3xl font-semibold tracking-tight">
@@ -33,7 +41,7 @@ export default async function TripsPage() {
 
         <div className="grid gap-3 md:grid-cols-2">
           {trips.map((trip) => (
-            <Link key={trip.id} href={`/trips/${trip.id}`}>
+            <Link key={trip.id} href={tripHref(trip)}>
               <Card className="h-full transition-colors hover:border-primary">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">

@@ -1,13 +1,15 @@
-import { ArrowLeft, ExternalLink, Star } from "lucide-react";
-import Link from "next/link";
+import { Edit3, ExternalLink, ImageIcon, Star } from "lucide-react";
 import { notFound } from "next/navigation";
 
 import { AppShell } from "@/components/app-shell/app-shell";
+import { Breadcrumbs } from "@/components/navigation/breadcrumbs";
+import { ArchiveSavedItemButton } from "@/components/saved-items/archive-saved-item-button";
+import { SavedItemEditForm } from "@/components/saved-items/saved-item-edit-form";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getSavedItem } from "@/lib/travel/queries";
-import { cn, formatDate } from "@/lib/utils";
+import { cn, extractEntityId, formatDate } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -17,42 +19,66 @@ export default async function SavedItemPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const item = await getSavedItem(id);
+  const item = await getSavedItem(extractEntityId(id));
 
   if (!item) notFound();
 
   return (
     <AppShell>
       <div className="mx-auto max-w-3xl space-y-4">
-        <Link
-          className={cn(buttonVariants({ variant: "ghost" }), "pl-0")}
-          href="/saved"
-        >
-          <ArrowLeft />
-          Saved memories
-        </Link>
+        <Breadcrumbs
+          items={[
+            { label: "Home", href: "/" },
+            { label: "Saved", href: "/saved" },
+            { label: item.title },
+          ]}
+        />
 
-        <Card>
-          <CardHeader>
-            <div className="flex flex-wrap items-center gap-2">
-              <Badge variant="secondary">
-                {item.detectedDestination ?? "Needs review"}
-              </Badge>
-              <Badge variant="outline">{item.category}</Badge>
-              <Badge variant={item.confidence < 0.6 ? "warning" : "muted"}>
-                confidence {Math.round(item.confidence * 100)}%
-              </Badge>
-              {item.isMustVisit ? (
-                <Badge>
-                  <Star className="mr-1 size-3" />
-                  Must visit
-                </Badge>
-              ) : null}
+        <Card className="overflow-hidden">
+          {item.thumbnailUrl ? (
+            <div
+              className="h-56 bg-muted bg-cover bg-center"
+              style={{ backgroundImage: `url(${item.thumbnailUrl})` }}
+            />
+          ) : (
+            <div className="flex h-36 items-center justify-center bg-accent text-accent-foreground">
+              <ImageIcon className="size-8" />
             </div>
-            <CardTitle className="text-2xl leading-tight">{item.title}</CardTitle>
-            <p className="text-sm text-muted-foreground">
-              Saved from {item.sourcePlatform ?? "Note"} on {formatDate(item.createdAt)}
-            </p>
+          )}
+          <CardHeader>
+            <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
+              <div className="space-y-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge variant="secondary">
+                    {item.detectedDestination ?? "Needs review"}
+                  </Badge>
+                  <Badge variant="outline">{item.category}</Badge>
+                  <Badge variant={item.confidence < 0.6 ? "warning" : "muted"}>
+                    confidence {Math.round(item.confidence * 100)}%
+                  </Badge>
+                  {item.isMustVisit ? (
+                    <Badge>
+                      <Star className="mr-1 size-3" />
+                      Must visit
+                    </Badge>
+                  ) : null}
+                </div>
+                <CardTitle className="text-2xl leading-tight">
+                  {item.title}
+                </CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Saved from {item.sourcePlatform ?? "Note"} on{" "}
+                  {formatDate(item.createdAt)}
+                </p>
+              </div>
+              <a
+                className={cn(buttonVariants({ variant: "outline", size: "sm" }), "gap-2")}
+                href="#edit-memory"
+              >
+                <Edit3 className="size-4" />
+                Edit
+              </a>
+            </div>
           </CardHeader>
           <CardContent className="space-y-5">
             <section>
@@ -64,7 +90,15 @@ export default async function SavedItemPage({
 
             {item.userNote ? (
               <section>
-                <h2 className="text-sm font-semibold">Your note</h2>
+                <div className="flex items-center justify-between gap-3">
+                  <h2 className="text-sm font-semibold">Your note</h2>
+                  <a
+                    className="text-sm font-medium text-primary hover:underline"
+                    href="#edit-memory"
+                  >
+                    Edit note
+                  </a>
+                </div>
                 <p className="mt-2 rounded-lg border bg-muted p-3 text-sm">
                   {item.userNote}
                 </p>
@@ -97,6 +131,18 @@ export default async function SavedItemPage({
                 <ExternalLink className="size-4" />
               </a>
             ) : null}
+          </CardContent>
+        </Card>
+
+        <Card id="edit-memory">
+          <CardHeader>
+            <CardTitle>Edit memory</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <SavedItemEditForm item={item} />
+              <ArchiveSavedItemButton itemId={item.id} />
+            </div>
           </CardContent>
         </Card>
       </div>

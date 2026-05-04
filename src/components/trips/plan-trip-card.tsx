@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
+import { tripHref } from "@/lib/utils";
 
 type PlanTripDefaults = {
   destination: string;
@@ -45,8 +46,10 @@ export function PlanTripCard({ defaults }: { defaults: PlanTripDefaults }) {
         return;
       }
 
-      const payload = (await response.json()) as { trip: { id: string } };
-      router.push(`/trips/${payload.trip.id}`);
+      const payload = (await response.json()) as {
+        trip: { id: string; destination: string };
+      };
+      router.push(tripHref(payload.trip));
       router.refresh();
     });
   }

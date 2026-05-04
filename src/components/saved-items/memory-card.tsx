@@ -1,9 +1,16 @@
-import { AlertTriangle, CheckCircle2, ExternalLink, ImageIcon, Star } from "lucide-react";
+import {
+  AlertTriangle,
+  CheckCircle2,
+  ExternalLink,
+  ImageIcon,
+  MapPin,
+  Star,
+} from "lucide-react";
 import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { formatDate } from "@/lib/utils";
+import { formatDate, savedItemHref } from "@/lib/utils";
 
 export type MemoryCardItem = {
   id: string;
@@ -12,6 +19,8 @@ export type MemoryCardItem = {
   detectedDestination: string | null;
   category: string;
   sourcePlatform: string | null;
+  originalUrl?: string | null;
+  thumbnailUrl?: string | null;
   confidence: number;
   tags: string[];
   createdAt: Date;
@@ -35,56 +44,77 @@ export function MemoryCard({ memory }: { memory: MemoryCardItem }) {
 
   return (
     <Card className="overflow-hidden transition-colors hover:border-primary/60">
-      <Link href={`/saved/${memory.id}`} className="block">
-      <div className="flex min-h-36">
-        <div className="flex w-28 shrink-0 items-center justify-center bg-accent text-accent-foreground sm:w-36">
-          <ImageIcon className="size-8" />
-        </div>
-        <CardContent className="flex flex-1 flex-col gap-3 p-4">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <div className="mb-2 flex flex-wrap gap-1.5">
-                <Badge variant="secondary">
-                  {memory.detectedDestination ?? "Needs review"}
-                </Badge>
-                <Badge variant="outline">{memory.category}</Badge>
-                <Badge variant={confidenceVariant[confidence]}>
-                  {confidence === "low" ? (
-                    <AlertTriangle className="mr-1 size-3" />
-                  ) : (
-                    <CheckCircle2 className="mr-1 size-3" />
-                  )}
-                  {confidence}
-                </Badge>
+      <Link href={savedItemHref(memory)} className="block">
+        <div className="flex min-h-40">
+          <MemoryVisual memory={memory} />
+          <CardContent className="flex flex-1 flex-col gap-3 p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <div className="mb-2 flex flex-wrap gap-1.5">
+                  <Badge variant="secondary">
+                    {memory.detectedDestination ?? "Needs review"}
+                  </Badge>
+                  <Badge variant="outline">{memory.category}</Badge>
+                  <Badge variant={confidenceVariant[confidence]}>
+                    {confidence === "low" ? (
+                      <AlertTriangle className="mr-1 size-3" />
+                    ) : (
+                      <CheckCircle2 className="mr-1 size-3" />
+                    )}
+                    {confidence}
+                  </Badge>
+                </div>
+                <h3 className="line-clamp-2 text-base font-semibold">
+                  {memory.title}
+                </h3>
               </div>
-              <h3 className="line-clamp-2 text-base font-semibold">
-                {memory.title}
-              </h3>
+              {memory.isMustVisit ? (
+                <Star className="size-4 shrink-0 fill-primary text-primary" />
+              ) : null}
             </div>
-            {memory.isMustVisit ? (
-              <Star className="size-4 shrink-0 fill-primary text-primary" />
-            ) : null}
-          </div>
-          <p className="line-clamp-2 text-sm text-muted-foreground">
-            {memory.summary ?? "No summary yet."}
-          </p>
-          <div className="mt-auto flex flex-wrap items-center justify-between gap-2">
-            <div className="flex flex-wrap gap-1.5">
-              {memory.tags.slice(0, 3).map((tag) => (
-                <Badge key={tag} variant="muted">
-                  {tag}
-                </Badge>
-              ))}
+            <p className="line-clamp-2 text-sm text-muted-foreground">
+              {memory.summary ?? "No summary yet."}
+            </p>
+            <div className="mt-auto flex flex-wrap items-center justify-between gap-2">
+              <div className="flex flex-wrap gap-1.5">
+                {memory.tags.slice(0, 3).map((tag) => (
+                  <Badge key={tag} variant="muted">
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <span>{memory.sourcePlatform ?? "Note"}</span>
+                <span>{formatDate(memory.createdAt)}</span>
+                {memory.originalUrl ? <ExternalLink className="size-3" /> : null}
+              </div>
             </div>
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <span>{memory.sourcePlatform ?? "Note"}</span>
-              <span>{formatDate(memory.createdAt)}</span>
-              <ExternalLink className="size-3" />
-            </div>
-          </div>
-        </CardContent>
-      </div>
+          </CardContent>
+        </div>
       </Link>
     </Card>
+  );
+}
+
+function MemoryVisual({ memory }: { memory: MemoryCardItem }) {
+  if (memory.thumbnailUrl) {
+    return (
+      <div
+        aria-hidden="true"
+        className="w-28 shrink-0 bg-muted bg-cover bg-center sm:w-36"
+        style={{ backgroundImage: `url(${memory.thumbnailUrl})` }}
+      />
+    );
+  }
+
+  const Icon = memory.detectedDestination ? MapPin : ImageIcon;
+
+  return (
+    <div className="flex w-28 shrink-0 flex-col items-center justify-center gap-2 bg-accent text-accent-foreground sm:w-36">
+      <Icon className="size-7" />
+      <span className="max-w-24 truncate px-2 text-xs font-medium">
+        {memory.category}
+      </span>
+    </div>
   );
 }

@@ -10,13 +10,13 @@ export const saveItemSchema = z
   });
 
 export const updateSavedItemSchema = z.object({
-  title: z.string().min(1).max(180).optional(),
-  summary: z.string().max(1000).optional().nullable(),
-  detectedDestination: z.string().max(120).optional().nullable(),
-  detectedPlaceName: z.string().max(180).optional().nullable(),
+  title: z.string().min(1).max(500).optional(),
+  summary: z.string().max(4000).optional().nullable(),
+  detectedDestination: z.string().max(240).optional().nullable(),
+  detectedPlaceName: z.string().max(300).optional().nullable(),
   category: z.string().max(80).optional(),
-  tags: z.array(z.string().max(60)).optional(),
-  userNote: z.string().max(2000).optional().nullable(),
+  tags: z.array(z.string().max(100)).optional(),
+  userNote: z.string().max(5000).optional().nullable(),
   isMustVisit: z.boolean().optional(),
 });
 

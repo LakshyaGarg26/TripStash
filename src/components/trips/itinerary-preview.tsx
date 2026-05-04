@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { getTrip } from "@/lib/travel/queries";
-import { cn } from "@/lib/utils";
+import { cn, tripHref } from "@/lib/utils";
 
 type TripWithItinerary = NonNullable<Awaited<ReturnType<typeof getTrip>>>;
 
@@ -39,7 +39,7 @@ export function ItineraryPreview({ trip }: { trip: TripWithItinerary | null }) {
         </div>
         <Link
           className={cn(buttonVariants({ variant: "outline" }), "gap-2")}
-          href={`/trips/${trip.id}`}
+          href={tripHref(trip)}
         >
           View full trip
           <ArrowRight className="size-4" />
@@ -67,7 +67,7 @@ export function ItineraryPreview({ trip }: { trip: TripWithItinerary | null }) {
               {day.items.map((item) => (
                 <Link
                   className="block rounded-lg border bg-background p-3 transition-colors hover:border-primary"
-                  href={`/trips/${trip.id}#item-${item.id}`}
+                  href={`${tripHref(trip)}#item-${item.id}`}
                   key={item.id}
                 >
                   <div className="flex items-start justify-between gap-3">

@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
+import { parseJsonFromModel } from "@/lib/ai/json";
 import { savedItemClassificationSchema } from "@/lib/validation/schemas";
 
 type ClassificationInput = {
@@ -16,11 +17,29 @@ export async function classifySavedItem(input: ClassificationInput) {
   }
 
   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+  const aiModel = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+  const model = genAI.getGenerativeModel({
+    model: aiModel,
+    generationConfig: {
+      responseMimeType: "application/json",
+      temperature: 0.2,
+    },
+  });
   const prompt = `
-Classify this travel memory. Return only JSON with:
-title, summary, detectedDestination, detectedPlaceName, category, tags,
-confidence, needsUserClarification, clarifyingQuestion.
+Classify this travel memory.
+
+Return JSON only with exactly these fields:
+{
+  "title": "string",
+  "summary": "string",
+  "detectedDestination": "string or null",
+  "detectedPlaceName": "string or null",
+  "category": "restaurant | cafe | activity | viewpoint | beach | hotel | area | route | tip | shopping | nightlife | culture | nature | food | other",
+  "tags": ["string"],
+  "confidence": 0.0,
+  "needsUserClarification": false,
+  "clarifyingQuestion": "string or null"
+}
 
 Do not invent exact place names when uncertain. If destination or place is weak,
 set confidence below 0.6 and ask one short clarification question.
@@ -29,11 +48,16 @@ Input:
 ${JSON.stringify(input, null, 2)}
 `;
 
-  const response = await model.generateContent(prompt);
-  const text = response.response.text().replace(/```json|```/g, "").trim();
-  const parsed = JSON.parse(text);
-
-  return savedItemClassificationSchema.parse(parsed);
+  try {
+    const response = await model.generateContent(prompt);
+    return parseJsonFromModel(response.response.text(), savedItemClassificationSchema);
+  } catch (error) {
+    console.warn(
+      "Gemini classification failed; using local fallback.",
+      error instanceof Error ? error.message : error,
+    );
+    return mockClassification(input);
+  }
 }
 
 function mockClassification(input: ClassificationInput) {

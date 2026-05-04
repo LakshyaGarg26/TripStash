@@ -1,9 +1,11 @@
 import { Search } from "lucide-react";
+import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { categories } from "@/lib/travel/categories";
+import { cn } from "@/lib/utils";
 
 import { AddMemoryCard } from "./add-memory-card";
 import { MemoryCard, type MemoryCardItem } from "./memory-card";
@@ -11,10 +13,23 @@ import { MemoryCard, type MemoryCardItem } from "./memory-card";
 export function MemoryInbox({
   memories,
   workspaceLabel,
+  activeCategory = "all",
+  query = "",
+  basePath = "/saved",
+  limit,
+  showViewMore = false,
 }: {
   memories: MemoryCardItem[];
   workspaceLabel: string;
+  activeCategory?: string;
+  query?: string;
+  basePath?: "/" | "/saved";
+  limit?: number;
+  showViewMore?: boolean;
 }) {
+  const visibleMemories = typeof limit === "number" ? memories.slice(0, limit) : memories;
+  const hasMore = typeof limit === "number" && memories.length > limit;
+
   return (
     <section className="space-y-5">
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
@@ -29,22 +44,43 @@ export function MemoryInbox({
               structured memories that can shape a real itinerary later.
             </p>
           </div>
-          <div className="relative max-w-xl">
+          <form className="relative max-w-xl" action={basePath}>
             <Search className="absolute left-3 top-3 size-4 text-muted-foreground" />
-            <Input className="pl-9" placeholder="Search saved memories" />
-          </div>
+            <Input
+              className="pl-9"
+              defaultValue={query}
+              name="q"
+              placeholder="Search saved memories"
+            />
+            {activeCategory !== "all" ? (
+              <input name="category" type="hidden" value={activeCategory} />
+            ) : null}
+          </form>
           <div className="flex gap-2 overflow-x-auto pb-1">
             {categories.map((category) => (
-              <Button
+              <Link
                 key={category.label}
-                className="shrink-0"
-                size="sm"
-                type="button"
-                variant={category.label === "All" ? "default" : "outline"}
+                className={cn(
+                  buttonVariants({
+                    size: "sm",
+                    variant:
+                      activeCategory === category.value ? "default" : "outline",
+                  }),
+                  "shrink-0",
+                )}
+                href={{
+                  pathname: basePath,
+                  query: {
+                    ...(category.value !== "all"
+                      ? { category: category.value }
+                      : {}),
+                    ...(query ? { q: query } : {}),
+                  },
+                }}
               >
                 <category.icon />
                 {category.label}
-              </Button>
+              </Link>
             ))}
           </div>
         </div>
@@ -52,10 +88,30 @@ export function MemoryInbox({
       </div>
 
       {memories.length > 0 ? (
-        <div className="grid gap-3 md:grid-cols-2">
-          {memories.map((memory) => (
-            <MemoryCard key={memory.id} memory={memory} />
-          ))}
+        <div className="space-y-4">
+          <div className="grid gap-3 md:grid-cols-2">
+            {visibleMemories.map((memory) => (
+              <MemoryCard key={memory.id} memory={memory} />
+            ))}
+          </div>
+          {showViewMore && hasMore ? (
+            <div className="flex justify-center">
+              <Link
+                className={cn(buttonVariants({ variant: "outline" }), "gap-2")}
+                href={{
+                  pathname: "/saved",
+                  query: {
+                    ...(activeCategory !== "all"
+                      ? { category: activeCategory }
+                      : {}),
+                    ...(query ? { q: query } : {}),
+                  },
+                }}
+              >
+                View more saved memories
+              </Link>
+            </div>
+          ) : null}
         </div>
       ) : (
         <div className="rounded-lg border bg-card p-8 text-center">

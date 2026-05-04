@@ -8,10 +8,10 @@ import {
 } from "lucide-react";
 
 export const categories = [
-  { label: "All", icon: Binoculars },
-  { label: "Food", icon: Coffee },
-  { label: "Nature", icon: Mountain },
-  { label: "Beach", icon: Waves },
-  { label: "Places", icon: MapPin },
-  { label: "Notes", icon: NotebookText },
+  { label: "All", value: "all", icon: Binoculars },
+  { label: "Food", value: "food", icon: Coffee },
+  { label: "Nature", value: "nature", icon: Mountain },
+  { label: "Beach", value: "beach", icon: Waves },
+  { label: "Places", value: "area", icon: MapPin },
+  { label: "Notes", value: "tip", icon: NotebookText },
 ];
